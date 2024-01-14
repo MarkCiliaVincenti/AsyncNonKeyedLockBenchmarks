@@ -128,41 +128,5 @@ namespace AsyncNonKeyedLockBenchmarks
 #pragma warning restore CS8604 // Possible null reference argument.
         }
         #endregion AsyncEx
-
-        #region AsyncUtilities
-        public AsyncUtilities.AsyncLock? AsyncUtilitiesLocker { get; set; }
-        public ParallelQuery<Task>? AsyncUtilitiesLockerTasks { get; set; }
-
-        [IterationSetup(Target = nameof(AsyncUtilities))]
-        public void SetupAsyncUtilities()
-        {
-            AsyncUtilitiesLocker = new();
-            AsyncUtilitiesLockerTasks = Enumerable.Range(1, Contention)
-                .Select(async i =>
-                {
-                    using (await AsyncUtilitiesLocker.LockAsync().ConfigureAwait(false))
-                    {
-                        Operation();
-                    }
-
-                    await Task.Yield();
-                }).AsParallel();
-        }
-
-        [IterationCleanup(Target = nameof(AsyncUtilities))]
-        public void CleanupAsyncUtilities()
-        {
-            AsyncUtilitiesLocker = null;
-            AsyncUtilitiesLockerTasks = null;
-        }
-
-        [Benchmark(Description = "AsyncUtilities")]
-        public async Task AsyncUtilities()
-        {
-#pragma warning disable CS8604 // Possible null reference argument.
-            await RunTests(AsyncUtilitiesLockerTasks).ConfigureAwait(false);
-#pragma warning restore CS8604 // Possible null reference argument.
-        }
-        #endregion AsyncEx
     }
 }
