@@ -121,7 +121,7 @@ namespace AsyncKeyedLockBenchmarks
             AsyncExLockerTasks = null;
         }
 
-        [Benchmark(Baseline = true, Description = "Async.Ex.Coordination")]
+        [Benchmark(Description = "Async.Ex.Coordination")]
         public async Task AsyncEx()
         {
 #pragma warning disable CS8604 // Possible null reference argument.
