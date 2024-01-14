@@ -5,7 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using Nito.AsyncEx;
 
-namespace AsyncKeyedLockBenchmarks
+namespace AsyncNonKeyedLockBenchmarks
 {
     //[Config(typeof(Config))]
     [Config(typeof(MemoryConfig))]
