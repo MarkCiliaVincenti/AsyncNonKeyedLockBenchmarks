@@ -3,7 +3,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
-using Nito.AsyncEx;
 
 namespace AsyncNonKeyedLockBenchmarks
 {
@@ -33,7 +32,7 @@ namespace AsyncNonKeyedLockBenchmarks
         //    }
         //}
 
-        [Params(1_000_000)] public int Contention { get; set; }
+        [Params(1_000)] public int Contention { get; set; }
 
         [Params(0, 1, 5)] public int GuidReversals { get; set; }
 
@@ -65,7 +64,7 @@ namespace AsyncNonKeyedLockBenchmarks
         [IterationSetup(Target = nameof(AsyncNonKeyedLock))]
         public void SetupAsyncNonKeyedLock()
         {
-            AsyncNonKeyedLocker = new AsyncNonKeyedLocker();
+            AsyncNonKeyedLocker = new();
             AsyncNonKeyedLockerTasks = Enumerable.Range(1, Contention)
                 .Select(async i =>
                 {
@@ -95,13 +94,13 @@ namespace AsyncNonKeyedLockBenchmarks
         #endregion AsyncKeyedLock
 
         #region AsyncEx
-        public AsyncLock? AsyncExLocker { get; set; }
+        public Nito.AsyncEx.AsyncLock? AsyncExLocker { get; set; }
         public ParallelQuery<Task>? AsyncExLockerTasks { get; set; }
 
         [IterationSetup(Target = nameof(AsyncEx))]
         public void SetupAsyncEx()
         {
-            AsyncExLocker = new AsyncLock();
+            AsyncExLocker = new();
             AsyncExLockerTasks = Enumerable.Range(1, Contention)
                 .Select(async i =>
                 {
@@ -128,6 +127,42 @@ namespace AsyncNonKeyedLockBenchmarks
             await RunTests(AsyncExLockerTasks).ConfigureAwait(false);
 #pragma warning restore CS8604 // Possible null reference argument.
         }
-        #endregion AsyncKeyedLock
+        #endregion AsyncEx
+
+        #region AsyncUtilities
+        public AsyncUtilities.AsyncLock? AsyncUtilitiesLocker { get; set; }
+        public ParallelQuery<Task>? AsyncUtilitiesLockerTasks { get; set; }
+
+        [IterationSetup(Target = nameof(AsyncUtilities))]
+        public void SetupAsyncUtilities()
+        {
+            AsyncUtilitiesLocker = new();
+            AsyncUtilitiesLockerTasks = Enumerable.Range(1, Contention)
+                .Select(async i =>
+                {
+                    using (await AsyncUtilitiesLocker.LockAsync().ConfigureAwait(false))
+                    {
+                        Operation();
+                    }
+
+                    await Task.Yield();
+                }).AsParallel();
+        }
+
+        [IterationCleanup(Target = nameof(AsyncUtilities))]
+        public void CleanupAsyncUtilities()
+        {
+            AsyncUtilitiesLocker = null;
+            AsyncUtilitiesLockerTasks = null;
+        }
+
+        [Benchmark(Description = "AsyncUtilities")]
+        public async Task AsyncUtilities()
+        {
+#pragma warning disable CS8604 // Possible null reference argument.
+            await RunTests(AsyncUtilitiesLockerTasks).ConfigureAwait(false);
+#pragma warning restore CS8604 // Possible null reference argument.
+        }
+        #endregion AsyncEx
     }
 }
