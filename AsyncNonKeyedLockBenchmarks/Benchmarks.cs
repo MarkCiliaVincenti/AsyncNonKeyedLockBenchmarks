@@ -33,7 +33,7 @@ namespace AsyncKeyedLockBenchmarks
         //    }
         //}
 
-        [Params(1_000, 100_000)] public int Contention { get; set; }
+        [Params(10_000, 100_000)] public int Contention { get; set; }
 
         [Params(0, 1, 5)] public int GuidReversals { get; set; }
 
