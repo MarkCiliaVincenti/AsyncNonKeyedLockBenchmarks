@@ -7,6 +7,7 @@ This is a project to help benchmark the [AsyncKeyedLock](https://github.com/Mark
 ## Solutions tested
 1. AsyncNonKeyedLocker (from [AsyncKeyedLock](https://github.com/MarkCiliaVincenti/AsyncKeyedLock))
 2. AsyncLock (from [Nito.AsyncEx.Coordination](https://github.com/StephenCleary/AsyncEx) by Stephen Cleary)
+3. AsyncLock (from [AsyncUtilities](https://github.com/i3arnon/AsyncUtilities) by Bar Arnon)
 
 ## Results
 The [benchmark results](https://github.com/MarkCiliaVincenti/AsyncNonKeyedLockBenchmarks/actions/workflows/dotnet.yml) can be found in our actions as they run in Github Actions, in a fully transparent fashion.
