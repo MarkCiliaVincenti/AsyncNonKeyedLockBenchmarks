@@ -34,7 +34,7 @@ jobs:
         with:
           name: Benchmark.Net Benchmark
           tool: 'benchmarkdotnet'
-          output-file-path: AsyncNonKeyedLockBenchmarks/BenchmarkDotNet.Artifacts/results/AsyncNonKeyedLockBenchmarks.Benchmarks-report-full-compressed.json
+          output-file-path: AsyncNonKeyedLockBenchmarks/bin/release/net8.0/BenchmarkDotNet.Artifacts/results/AsyncNonKeyedLockBenchmarks.Benchmarks-report-full-compressed.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           # Show alert with commit comment on detecting possible performance regression

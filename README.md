@@ -1,7 +1,7 @@
 # Benchmarks for the AsyncKeyedLock library's AsyncNonKeyedLocker
 This is a project to help benchmark the [AsyncKeyedLock](https://github.com/MarkCiliaVincenti/AsyncKeyedLock) library's AsyncNonKeyedLocker against other competing solutions. We are testing with 3 separate parameters:
 
-1. Contention: 10,000 and 100,000
+1. Contention: 1,000,000
 2. GUID reversals (to simulate some load): 0, 1 and 5
 
 ## Solutions tested
