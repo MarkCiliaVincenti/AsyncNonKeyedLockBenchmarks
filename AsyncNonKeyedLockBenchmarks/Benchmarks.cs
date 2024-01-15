@@ -163,6 +163,42 @@ namespace AsyncNonKeyedLockBenchmarks
             await RunTests(AsyncUtilitiesLockerTasks).ConfigureAwait(false);
 #pragma warning restore CS8604 // Possible null reference argument.
         }
-        #endregion AsyncEx
+        #endregion AsyncUtilities
+
+        #region NeoSmart
+        public NeoSmart.AsyncLock.AsyncLock? NeoSmartLocker { get; set; }
+        public ParallelQuery<Task>? NeoSmartTasks { get; set; }
+
+        [IterationSetup(Target = nameof(NeoSmart))]
+        public void SetupNeoSmart()
+        {
+            NeoSmartLocker = new();
+            NeoSmartTasks = Enumerable.Range(1, Contention)
+                .Select(async i =>
+                {
+                    using (await NeoSmartLocker.LockAsync().ConfigureAwait(false))
+                    {
+                        Operation();
+                    }
+
+                    await Task.Yield();
+                }).AsParallel();
+        }
+
+        [IterationCleanup(Target = nameof(NeoSmart))]
+        public void CleanupNeoSmart()
+        {
+            NeoSmartLocker = null;
+            NeoSmartTasks = null;
+        }
+
+        [Benchmark(Description = "NeoSmart.AsyncLock")]
+        public async Task NeoSmart()
+        {
+#pragma warning disable CS8604 // Possible null reference argument.
+            await RunTests(NeoSmartTasks).ConfigureAwait(false);
+#pragma warning restore CS8604 // Possible null reference argument.
+        }
+        #endregion NeoSmart
     }
 }
