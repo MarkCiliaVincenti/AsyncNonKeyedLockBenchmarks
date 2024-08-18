@@ -200,5 +200,41 @@ namespace AsyncNonKeyedLockBenchmarks
 #pragma warning restore CS8604 // Possible null reference argument.
         }
         #endregion NeoSmart
+
+        #region ProtoPromise
+        public Proto.Promises.Threading.AsyncLock? ProtoPromiseLocker { get; set; }
+        public ParallelQuery<Task>? ProtoPromiseTasks { get; set; }
+
+        [IterationSetup(Target = nameof(ProtoPromise))]
+        public void SetupProtoPromise()
+        {
+            ProtoPromiseLocker = new();
+            ProtoPromiseTasks = Enumerable.Range(1, Contention)
+                .Select(async i =>
+                {
+                    using (await ProtoPromiseLocker.LockAsync())
+                    {
+                        Operation();
+                    }
+
+                    await Task.Yield();
+                }).AsParallel();
+        }
+
+        [IterationCleanup(Target = nameof(ProtoPromise))]
+        public void CleanupProtoPromise()
+        {
+            ProtoPromiseLocker = null;
+            ProtoPromiseTasks = null;
+        }
+
+        [Benchmark(Description = "ProtoPromise.AsyncLock")]
+        public async Task ProtoPromise()
+        {
+#pragma warning disable CS8604 // Possible null reference argument.
+            await RunTests(ProtoPromiseTasks).ConfigureAwait(false);
+#pragma warning restore CS8604 // Possible null reference argument.
+        }
+        #endregion ProtoPromise
     }
 }
