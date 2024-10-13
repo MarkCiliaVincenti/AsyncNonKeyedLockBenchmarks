@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1724171089867,
+  "lastUpdate": 1728839067649,
   "repoUrl": "https://github.com/MarkCiliaVincenti/AsyncNonKeyedLockBenchmarks",
   "entries": {
     "Benchmark.Net Benchmark": [
@@ -714,6 +714,120 @@ window.BENCHMARK_DATA = {
             "value": 5553121585.033334,
             "unit": "ns",
             "range": "± 68713256.00529039"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "markciliavincenti@gmail.com",
+            "name": "Mark Cilia Vincenti",
+            "username": "MarkCiliaVincenti"
+          },
+          "committer": {
+            "email": "markciliavincenti@gmail.com",
+            "name": "Mark Cilia Vincenti",
+            "username": "MarkCiliaVincenti"
+          },
+          "distinct": true,
+          "id": "e9357b1ccc29e026986e8845d8f7e894049e22d8",
+          "message": "Bump AsyncKeyedLock to 7.0.2. Performance on .NET 9.0 not expected to change.",
+          "timestamp": "2024-10-13T18:41:36+02:00",
+          "tree_id": "ec294f8c426be248ae4edaee13e50d1cad98c0c0",
+          "url": "https://github.com/MarkCiliaVincenti/AsyncNonKeyedLockBenchmarks/commit/e9357b1ccc29e026986e8845d8f7e894049e22d8"
+        },
+        "date": 1728839067222,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncNonKeyedLock(Contention: 1000000, GuidReversals: 0)",
+            "value": 375246707.31,
+            "unit": "ns",
+            "range": "± 35450331.76344056"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncEx(Contention: 1000000, GuidReversals: 0)",
+            "value": 836755224.4285715,
+            "unit": "ns",
+            "range": "± 19876671.8385999"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncUtilities(Contention: 1000000, GuidReversals: 0)",
+            "value": 385478642.68,
+            "unit": "ns",
+            "range": "± 33740657.35986556"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.NeoSmart(Contention: 1000000, GuidReversals: 0)",
+            "value": 3617060831.142857,
+            "unit": "ns",
+            "range": "± 22011046.20660721"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.ProtoPromise(Contention: 1000000, GuidReversals: 0)",
+            "value": 324497713.64,
+            "unit": "ns",
+            "range": "± 27734135.341452923"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncNonKeyedLock(Contention: 1000000, GuidReversals: 1)",
+            "value": 1757776880.2142856,
+            "unit": "ns",
+            "range": "± 13551283.533199338"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncEx(Contention: 1000000, GuidReversals: 1)",
+            "value": 2026813611.6666667,
+            "unit": "ns",
+            "range": "± 12230459.775948325"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncUtilities(Contention: 1000000, GuidReversals: 1)",
+            "value": 1765401484.357143,
+            "unit": "ns",
+            "range": "± 16635379.212375907"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.NeoSmart(Contention: 1000000, GuidReversals: 1)",
+            "value": 5120147817.933333,
+            "unit": "ns",
+            "range": "± 63552661.90223"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.ProtoPromise(Contention: 1000000, GuidReversals: 1)",
+            "value": 1701124132.2666667,
+            "unit": "ns",
+            "range": "± 11915838.43572952"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncNonKeyedLock(Contention: 1000000, GuidReversals: 5)",
+            "value": 5477055194.133333,
+            "unit": "ns",
+            "range": "± 67069078.12000243"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncEx(Contention: 1000000, GuidReversals: 5)",
+            "value": 5654110528.466666,
+            "unit": "ns",
+            "range": "± 55570262.789160825"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.AsyncUtilities(Contention: 1000000, GuidReversals: 5)",
+            "value": 5573675707.8,
+            "unit": "ns",
+            "range": "± 61290894.28622946"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.NeoSmart(Contention: 1000000, GuidReversals: 5)",
+            "value": 8958094105.285715,
+            "unit": "ns",
+            "range": "± 61766684.26168292"
+          },
+          {
+            "name": "AsyncNonKeyedLockBenchmarks.Benchmarks.ProtoPromise(Contention: 1000000, GuidReversals: 5)",
+            "value": 5512303552.233334,
+            "unit": "ns",
+            "range": "± 70380936.32714152"
           }
         ]
       }
