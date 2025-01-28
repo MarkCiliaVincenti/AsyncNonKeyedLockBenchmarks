@@ -3,6 +3,8 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
+using Proto.Promises;
+using Proto.Utilities.Benchmark;
 
 namespace AsyncNonKeyedLockBenchmarks
 {
@@ -32,209 +34,166 @@ namespace AsyncNonKeyedLockBenchmarks
         //    }
         //}
 
-        [Params(1_000_000)] public int Contention { get; set; }
+        [Params(1_000)] public int Contention { get; set; }
 
         [Params(0, 1, 5)] public int GuidReversals { get; set; }
+
+        private AsyncBenchmarkThreadHelper? _threadHelper;
 
         private void Operation()
         {
             for (int i = 0; i < GuidReversals; i++)
             {
                 Guid guid = Guid.NewGuid();
-                var guidString = guid.ToString();
-                guidString = guidString.Reverse().ToString();
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                string guidString = guid.ToString();
+                guidString = guidString.Reverse().ToString()!;
                 if (guidString.Length != 53)
                 {
-                    throw new Exception($"Not 53 but {guidString?.Length}");
+                    throw new Exception($"Not 53 but {guidString.Length}");
                 }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
             }
         }
 
-        private async Task RunTests(ParallelQuery<Task> tasks)
+        [GlobalCleanup]
+        public void Cleanup()
         {
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            _threadHelper!.Dispose();
+            _threadHelper = null;
         }
 
         #region AsyncNonKeyedLocker
-        public AsyncNonKeyedLocker? AsyncNonKeyedLocker { get; set; }
-        public ParallelQuery<Task>? AsyncNonKeyedLockerTasks { get; set; }
 
-        [IterationSetup(Target = nameof(AsyncNonKeyedLock))]
+        [GlobalSetup(Target = nameof(AsyncNonKeyedLock))]
         public void SetupAsyncNonKeyedLock()
         {
-            AsyncNonKeyedLocker = new();
-            AsyncNonKeyedLockerTasks = Enumerable.Range(1, Contention)
-                .Select(async i =>
+            var locker = new AsyncNonKeyedLocker();
+            _threadHelper = new(Contention);
+            for (int i = 0; i < Contention; ++i)
+            {
+                _threadHelper.Add(() => Core());
+            }
+
+            // Using `async Promise` instead of `async (Value)Task` to avoid allocations of the async method that we aren't interested in measuring.
+            async Promise Core()
+            {
+                using (await locker.LockAsync().ConfigureAwait(false))
                 {
-                    using (await AsyncNonKeyedLocker.LockAsync().ConfigureAwait(false))
-                    {
-                        Operation();
-                    }
-
-                    await Task.Yield();
-                }).AsParallel();
-        }
-
-        [IterationCleanup(Target = nameof(AsyncNonKeyedLock))]
-        public void CleanupAsyncKeyedLock()
-        {
-            AsyncNonKeyedLocker = null;
-            AsyncNonKeyedLockerTasks = null;
+                    Operation();
+                }
+            }
         }
 
         [Benchmark(Baseline = true, Description = "AsyncNonKeyedLocker")]
-        public async Task AsyncNonKeyedLock()
-        {
-#pragma warning disable CS8604 // Possible null reference argument.
-            await RunTests(AsyncNonKeyedLockerTasks).ConfigureAwait(false);
-#pragma warning restore CS8604 // Possible null reference argument.
-        }
+        public ValueTask AsyncNonKeyedLock()
+            => _threadHelper!.ExecuteAndWaitAsync();
         #endregion AsyncKeyedLock
 
         #region AsyncEx
-        public Nito.AsyncEx.AsyncLock? AsyncExLocker { get; set; }
-        public ParallelQuery<Task>? AsyncExLockerTasks { get; set; }
 
-        [IterationSetup(Target = nameof(AsyncEx))]
+        [GlobalSetup(Target = nameof(AsyncEx))]
         public void SetupAsyncEx()
         {
-            AsyncExLocker = new();
-            AsyncExLockerTasks = Enumerable.Range(1, Contention)
-                .Select(async i =>
+            var locker = new Nito.AsyncEx.AsyncLock();
+            _threadHelper = new(Contention);
+            for (int i = 0; i < Contention; ++i)
+            {
+                _threadHelper.Add(() => Core());
+            }
+
+            // Using `async Promise` instead of `async (Value)Task` to avoid allocations of the async method that we aren't interested in measuring.
+            async Promise Core()
+            {
+                using (await locker.LockAsync().ConfigureAwait(false))
                 {
-                    using (await AsyncExLocker.LockAsync().ConfigureAwait(false))
-                    {
-                        Operation();
-                    }
-
-                    await Task.Yield();
-                }).AsParallel();
-        }
-
-        [IterationCleanup(Target = nameof(AsyncEx))]
-        public void CleanupAsyncEx()
-        {
-            AsyncExLocker = null;
-            AsyncExLockerTasks = null;
+                    Operation();
+                }
+            }
         }
 
         [Benchmark(Description = "Async.Ex.Coordination")]
-        public async Task AsyncEx()
-        {
-#pragma warning disable CS8604 // Possible null reference argument.
-            await RunTests(AsyncExLockerTasks).ConfigureAwait(false);
-#pragma warning restore CS8604 // Possible null reference argument.
-        }
+        public ValueTask AsyncEx()
+            => _threadHelper!.ExecuteAndWaitAsync();
         #endregion AsyncEx
 
         #region AsyncUtilities
-        public AsyncUtilities.AsyncLock? AsyncUtilitiesLocker { get; set; }
-        public ParallelQuery<Task>? AsyncUtilitiesLockerTasks { get; set; }
 
-        [IterationSetup(Target = nameof(AsyncUtilities))]
+        [GlobalSetup(Target = nameof(AsyncUtilities))]
         public void SetupAsyncUtilities()
         {
-            AsyncUtilitiesLocker = new();
-            AsyncUtilitiesLockerTasks = Enumerable.Range(1, Contention)
-                .Select(async i =>
+            var locker = new AsyncUtilities.AsyncLock();
+            _threadHelper = new(Contention);
+            for (int i = 0; i < Contention; ++i)
+            {
+                _threadHelper.Add(() => Core());
+            }
+
+            // Using `async Promise` instead of `async (Value)Task` to avoid allocations of the async method that we aren't interested in measuring.
+            async Promise Core()
+            {
+                using (await locker.LockAsync().ConfigureAwait(false))
                 {
-                    using (await AsyncUtilitiesLocker.LockAsync().ConfigureAwait(false))
-                    {
-                        Operation();
-                    }
-
-                    await Task.Yield();
-                }).AsParallel();
-        }
-
-        [IterationCleanup(Target = nameof(AsyncUtilities))]
-        public void CleanupAsyncUtilities()
-        {
-            AsyncUtilitiesLocker = null;
-            AsyncUtilitiesLockerTasks = null;
+                    Operation();
+                }
+            }
         }
 
         [Benchmark(Description = "AsyncUtilities")]
-        public async Task AsyncUtilities()
-        {
-#pragma warning disable CS8604 // Possible null reference argument.
-            await RunTests(AsyncUtilitiesLockerTasks).ConfigureAwait(false);
-#pragma warning restore CS8604 // Possible null reference argument.
-        }
+        public ValueTask AsyncUtilities()
+            => _threadHelper!.ExecuteAndWaitAsync();
         #endregion AsyncUtilities
 
         #region NeoSmart
-        public NeoSmart.AsyncLock.AsyncLock? NeoSmartLocker { get; set; }
-        public ParallelQuery<Task>? NeoSmartTasks { get; set; }
 
-        [IterationSetup(Target = nameof(NeoSmart))]
+        [GlobalSetup(Target = nameof(NeoSmart))]
         public void SetupNeoSmart()
         {
-            NeoSmartLocker = new();
-            NeoSmartTasks = Enumerable.Range(1, Contention)
-                .Select(async i =>
+            var locker = new NeoSmart.AsyncLock.AsyncLock();
+            _threadHelper = new(Contention);
+            for (int i = 0; i < Contention; ++i)
+            {
+                _threadHelper.Add(() => Core());
+            }
+
+            // Using `async Promise` instead of `async (Value)Task` to avoid allocations of the async method that we aren't interested in measuring.
+            async Promise Core()
+            {
+                using (await locker.LockAsync().ConfigureAwait(false))
                 {
-                    using (await NeoSmartLocker.LockAsync().ConfigureAwait(false))
-                    {
-                        Operation();
-                    }
-
-                    await Task.Yield();
-                }).AsParallel();
-        }
-
-        [IterationCleanup(Target = nameof(NeoSmart))]
-        public void CleanupNeoSmart()
-        {
-            NeoSmartLocker = null;
-            NeoSmartTasks = null;
+                    Operation();
+                }
+            }
         }
 
         [Benchmark(Description = "NeoSmart.AsyncLock")]
-        public async Task NeoSmart()
-        {
-#pragma warning disable CS8604 // Possible null reference argument.
-            await RunTests(NeoSmartTasks).ConfigureAwait(false);
-#pragma warning restore CS8604 // Possible null reference argument.
-        }
+        public ValueTask NeoSmart()
+            => _threadHelper!.ExecuteAndWaitAsync();
         #endregion NeoSmart
 
         #region ProtoPromise
-        public Proto.Promises.Threading.AsyncLock? ProtoPromiseLocker { get; set; }
-        public ParallelQuery<Task>? ProtoPromiseTasks { get; set; }
 
-        [IterationSetup(Target = nameof(ProtoPromise))]
+        [GlobalSetup(Target = nameof(ProtoPromise))]
         public void SetupProtoPromise()
         {
-            ProtoPromiseLocker = new();
-            ProtoPromiseTasks = Enumerable.Range(1, Contention)
-                .Select(async i =>
+            var locker = new Proto.Promises.Threading.AsyncLock();
+            _threadHelper = new(Contention);
+            for (int i = 0; i < Contention; ++i)
+            {
+                _threadHelper.Add(() => Core());
+            }
+
+            // Using `async Promise` instead of `async (Value)Task` to avoid allocations of the async method that we aren't interested in measuring.
+            async Promise Core()
+            {
+                using (await locker.LockAsync())
                 {
-                    using (await ProtoPromiseLocker.LockAsync())
-                    {
-                        Operation();
-                    }
-
-                    await Task.Yield();
-                }).AsParallel();
-        }
-
-        [IterationCleanup(Target = nameof(ProtoPromise))]
-        public void CleanupProtoPromise()
-        {
-            ProtoPromiseLocker = null;
-            ProtoPromiseTasks = null;
+                    Operation();
+                }
+            }
         }
 
         [Benchmark(Description = "ProtoPromise.AsyncLock")]
-        public async Task ProtoPromise()
-        {
-#pragma warning disable CS8604 // Possible null reference argument.
-            await RunTests(ProtoPromiseTasks).ConfigureAwait(false);
-#pragma warning restore CS8604 // Possible null reference argument.
-        }
+        public ValueTask ProtoPromise()
+            => _threadHelper!.ExecuteAndWaitAsync();
         #endregion ProtoPromise
     }
 }
