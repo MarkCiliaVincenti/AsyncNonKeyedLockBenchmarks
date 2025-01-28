@@ -13,7 +13,7 @@
 		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
 		<PackageReference Include="NeoSmart.AsyncLock" Version="3.2.1" />
 		<PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
-		<PackageReference Include="ProtoPromise" Version="3.2.0" />
+		<PackageReference Include="ProtoPromise" Version="3.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
