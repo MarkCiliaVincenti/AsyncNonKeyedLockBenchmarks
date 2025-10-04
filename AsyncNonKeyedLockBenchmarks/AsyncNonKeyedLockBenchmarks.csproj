@@ -8,12 +8,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AsyncKeyedLock" Version="7.1.3" />
+		<PackageReference Include="AsyncKeyedLock" Version="7.1.7" />
 		<PackageReference Include="AsyncUtilities" Version="1.1.1" />
-		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.15.4" />
 		<PackageReference Include="NeoSmart.AsyncLock" Version="3.2.1" />
 		<PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
-		<PackageReference Include="ProtoPromise" Version="3.2.0" />
+		<PackageReference Include="ProtoPromise" Version="3.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>
