@@ -20,14 +20,7 @@ namespace AsyncNonKeyedLockBenchmarks
             }
         }
 
-        [ParamsSource(nameof(Configurations))]
-        public (int NumberOfLocks, int Contention) Setting { get; set; }
-        public (int NumberOfLocks, int Contention)[] Configurations { get; } =
-        {
-            (200, 100),
-            (200, 10_000),
-            (10_000, 100)
-        };
+        [Params(100_000, 250_000)] public int Contention { get; set; }
 
         [Params(0, 1, 5)] public int GuidReversals { get; set; }
 
@@ -60,7 +53,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupAsyncNonKeyedLock()
         {
             AsyncNonKeyedLocker = new();
-            AsyncNonKeyedLockerTasks = Enumerable.Range(1, Setting.Contention)
+            AsyncNonKeyedLockerTasks = Enumerable.Range(1, Contention)
                 .Select(async i =>
                 {
                     using (await AsyncNonKeyedLocker.LockAsync().ConfigureAwait(false))
@@ -96,7 +89,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupAsyncEx()
         {
             AsyncExLocker = new();
-            AsyncExLockerTasks = Enumerable.Range(1, Setting.Contention)
+            AsyncExLockerTasks = Enumerable.Range(1, Contention)
                 .Select(async i =>
                 {
                     using (await AsyncExLocker.LockAsync().ConfigureAwait(false))
@@ -132,7 +125,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupAsyncUtilities()
         {
             AsyncUtilitiesLocker = new();
-            AsyncUtilitiesLockerTasks = Enumerable.Range(1, Setting.Contention)
+            AsyncUtilitiesLockerTasks = Enumerable.Range(1, Contention)
                 .Select(async i =>
                 {
                     using (await AsyncUtilitiesLocker.LockAsync().ConfigureAwait(false))
@@ -168,7 +161,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupNeoSmart()
         {
             NeoSmartLocker = new();
-            NeoSmartTasks = Enumerable.Range(1, Setting.Contention)
+            NeoSmartTasks = Enumerable.Range(1, Contention)
                 .Select(async i =>
                 {
                     using (await NeoSmartLocker.LockAsync().ConfigureAwait(false))
@@ -204,7 +197,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupProtoPromise()
         {
             ProtoPromiseLocker = new();
-            ProtoPromiseTasks = Enumerable.Range(1, Setting.Contention)
+            ProtoPromiseTasks = Enumerable.Range(1, Contention)
                 .Select(async i =>
                 {
                     using (await ProtoPromiseLocker.LockAsync())
