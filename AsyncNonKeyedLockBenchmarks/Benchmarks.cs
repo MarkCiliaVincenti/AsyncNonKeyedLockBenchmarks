@@ -2,11 +2,10 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Jobs;
+using DeterministicGuids;
 
 namespace AsyncNonKeyedLockBenchmarks
 {
-    //[Config(typeof(Config))]
     [Config(typeof(MemoryConfig))]
     [MemoryDiagnoser]
     [JsonExporterAttribute.Full]
@@ -21,18 +20,14 @@ namespace AsyncNonKeyedLockBenchmarks
             }
         }
 
-        //private class Config : ManualConfig
-        //{
-        //    public Config()
-        //    {
-        //        var baseJob = Job.Default;
-
-        //        AddJob(baseJob.WithNuGet("AsyncKeyedLock", "6.2.5").WithBaseline(true));
-        //        AddJob(baseJob.WithNuGet("AsyncKeyedLock", "6.2.6-alpha"));
-        //    }
-        //}
-
-        [Params(1_000_000)] public int Contention { get; set; }
+        [ParamsSource(nameof(Configurations))]
+        public (int NumberOfLocks, int Contention) Setting { get; set; }
+        public (int NumberOfLocks, int Contention)[] Configurations { get; } =
+        {
+            (200, 100),
+            (200, 10_000),
+            (10_000, 100)
+        };
 
         [Params(0, 1, 5)] public int GuidReversals { get; set; }
 
@@ -40,7 +35,7 @@ namespace AsyncNonKeyedLockBenchmarks
         {
             for (int i = 0; i < GuidReversals; i++)
             {
-                Guid guid = Guid.NewGuid();
+                Guid guid = DeterministicGuid.Create(DeterministicGuid.Namespaces.Events, i.ToString());
                 var guidString = guid.ToString();
                 guidString = guidString.Reverse().ToString();
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
@@ -65,7 +60,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupAsyncNonKeyedLock()
         {
             AsyncNonKeyedLocker = new();
-            AsyncNonKeyedLockerTasks = Enumerable.Range(1, Contention)
+            AsyncNonKeyedLockerTasks = Enumerable.Range(1, Setting.Contention)
                 .Select(async i =>
                 {
                     using (await AsyncNonKeyedLocker.LockAsync().ConfigureAwait(false))
@@ -101,7 +96,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupAsyncEx()
         {
             AsyncExLocker = new();
-            AsyncExLockerTasks = Enumerable.Range(1, Contention)
+            AsyncExLockerTasks = Enumerable.Range(1, Setting.Contention)
                 .Select(async i =>
                 {
                     using (await AsyncExLocker.LockAsync().ConfigureAwait(false))
@@ -137,7 +132,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupAsyncUtilities()
         {
             AsyncUtilitiesLocker = new();
-            AsyncUtilitiesLockerTasks = Enumerable.Range(1, Contention)
+            AsyncUtilitiesLockerTasks = Enumerable.Range(1, Setting.Contention)
                 .Select(async i =>
                 {
                     using (await AsyncUtilitiesLocker.LockAsync().ConfigureAwait(false))
@@ -173,7 +168,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupNeoSmart()
         {
             NeoSmartLocker = new();
-            NeoSmartTasks = Enumerable.Range(1, Contention)
+            NeoSmartTasks = Enumerable.Range(1, Setting.Contention)
                 .Select(async i =>
                 {
                     using (await NeoSmartLocker.LockAsync().ConfigureAwait(false))
@@ -209,7 +204,7 @@ namespace AsyncNonKeyedLockBenchmarks
         public void SetupProtoPromise()
         {
             ProtoPromiseLocker = new();
-            ProtoPromiseTasks = Enumerable.Range(1, Contention)
+            ProtoPromiseTasks = Enumerable.Range(1, Setting.Contention)
                 .Select(async i =>
                 {
                     using (await ProtoPromiseLocker.LockAsync())
