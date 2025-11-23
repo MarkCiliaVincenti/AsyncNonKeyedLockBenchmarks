@@ -20,7 +20,7 @@ namespace AsyncNonKeyedLockBenchmarks
             }
         }
 
-        [Params(100_000, 250_000)] public int Contention { get; set; }
+        [Params(200_000, 500_000)] public int Contention { get; set; }
 
         [Params(0, 1, 5)] public int GuidReversals { get; set; }
 
