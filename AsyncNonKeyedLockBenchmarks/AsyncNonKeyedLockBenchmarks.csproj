@@ -14,7 +14,7 @@
 		<PackageReference Include="DeterministicGuids" Version="1.0.9" />
 		<PackageReference Include="NeoSmart.AsyncLock" Version="3.2.1" />
 		<PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
-		<PackageReference Include="ProtoPromise" Version="3.5.0" />
+		<PackageReference Include="ProtoPromise" Version="3.5.1" />
 	</ItemGroup>
 
 	<ItemGroup>
